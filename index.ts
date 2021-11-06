@@ -18,15 +18,27 @@ class NumericInput {
 
   private keydown(event: any) {
     const key = event.key as string;
-    if (!+key || isNaN(+key)) {
+    const allowKeys = [
+      'ArrowLeft',
+      'ArrowUp',
+      'ArrowDown',
+      'ArrowRight',
+      'Backspace',
+      'Delete',
+    ];
+    if (!/\d+/.test(key) && !allowKeys.includes(key)) {
       event.preventDefault();
       return false;
     }
   }
 
   private keyup(event: any) {
-    const value = +event.target.value;
-    console.log(value);
+    const formatted = this.formatNumber(event.target.value.replace(/,/g, ''));
+    this.element.value = formatted;
+  }
+
+  private formatNumber(num: string, separator: ',' | '.' = ',') {
+    return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + separator);
   }
 }
 
