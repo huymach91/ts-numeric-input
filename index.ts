@@ -16,6 +16,10 @@ class NumericInput {
 
   private keydown(event: any) {
     const key = event.key as string;
+    if (!+key || isNaN(+key)) {
+      event.preventDefault();
+      return false;
+    }
   }
 
   private keyup() {}
