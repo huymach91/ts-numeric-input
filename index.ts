@@ -2,10 +2,22 @@
 import './style.css';
 
 class NumericInput {
-  keydownRef: any;
-  keyupRef: any;
+  private keydownRef: any;
+  private keyupRef: any;
+  private allowControlKeys = [
+    'ArrowLeft',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowRight',
+    'Backspace',
+    'Delete',
+  ];
+  private isControlKey: boolean = false;
 
-  constructor(private element: HTMLInputElement) {
+  constructor(
+    private element: HTMLInputElement,
+    private optional: { separator: ',' | '.' } = { separator: ',' }
+  ) {
     this.init();
   }
 
@@ -18,27 +30,37 @@ class NumericInput {
 
   private keydown(event: any) {
     const key = event.key as string;
-    const allowKeys = [
-      'ArrowLeft',
-      'ArrowUp',
-      'ArrowDown',
-      'ArrowRight',
-      'Backspace',
-      'Delete',
-    ];
-    if (!/\d+/.test(key) && !allowKeys.includes(key)) {
+    if (!/\d+/.test(key) && !this.allowControlKeys.includes(key)) {
       event.preventDefault();
       return false;
     }
+
+    this.isControlKey = this.allowControlKeys.includes(key);
   }
 
   private keyup(event: any) {
-    const formatted = this.formatNumber(event.target.value.replace(/,/g, ''));
-    this.element.value = formatted;
+    if (this.isControlKey) return;
+    this.clearSeparator();
+    setTimeout(() => {
+      const value2 = this.element.value as string;
+      console.log(value2);
+      for (let i = value2.length - 3; i > 0; i -= 3) {
+        this.insertSeparator(i, this.optional.separator);
+      }
+    }, 10);
   }
 
-  private formatNumber(num: string, separator: ',' | '.' = ',') {
-    return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + separator);
+  private insertSeparator(position: number, insertValue: string) {
+    this.element.setRangeText(insertValue, position, position);
+  }
+
+  private clearSeparator() {
+    for (let i = 0; i < this.element.value.length; i++) {
+      if (this.element.value[i] === this.optional.separator) {
+        console.log(i);
+        this.element.setRangeText('', i, i + 1);
+      }
+    }
   }
 }
 
