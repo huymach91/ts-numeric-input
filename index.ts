@@ -11,7 +11,9 @@ class NumericInput {
 
   private init() {
     this.keydownRef = this.keydown.bind(this);
+    this.keyupRef = this.keyup.bind(this);
     this.element.addEventListener('keydown', this.keydownRef);
+    this.element.addEventListener('keyup', this.keyupRef);
   }
 
   private keydown(event: any) {
@@ -22,9 +24,10 @@ class NumericInput {
     }
   }
 
-  private keyup() {}
-
-  private blur() {}
+  private keyup(event: any) {
+    const value = +event.target.value;
+    console.log(value);
+  }
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
