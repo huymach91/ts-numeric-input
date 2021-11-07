@@ -48,7 +48,8 @@ class NumericInput {
     const isSelect = event.ctrlKey && key === 'a';
     const isCopy = event.ctrlKey && key === 'c';
     const isPaste = event.ctrlKey && key === 'v';
-
+    const isCut = event.ctrlKey && key === 'x';
+    const isUndo = event.ctrlKey && key === 'z';
     // reset
     this.isRemoveKey = false;
     this.isNumberKey = false;
@@ -67,6 +68,8 @@ class NumericInput {
       !isSelect &&
       !isCopy &&
       !isPaste &&
+      !isCut &&
+      !isUndo &&
       !this.separatorKeys.includes(key)
     ) {
       event.preventDefault();
