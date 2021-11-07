@@ -22,6 +22,9 @@ class NumericInput {
   private isPaste: boolean = false;
   private isSeprator: boolean = false;
 
+  private fractionalPosition: number;
+  private fractionalChar: string;
+
   constructor(
     private element: HTMLInputElement,
     private optional: INumericInputOptional = {
@@ -29,6 +32,10 @@ class NumericInput {
       fractionDigits: 2,
     }
   ) {
+    this.fractionalChar = this.optional.separator === ',' ? '.' : ',';
+    this.separatorKeys = this.optional.fractionDigits
+      ? ['.', ',']
+      : [this.optional.separator];
     this.init();
   }
 
@@ -37,10 +44,6 @@ class NumericInput {
     this.keyupRef = this.keyup.bind(this);
     this.element.addEventListener('keydown', this.keydownRef);
     this.element.addEventListener('keyup', this.keyupRef);
-
-    this.separatorKeys = this.optional.fractionDigits
-      ? ['.', ',']
-      : [this.optional.separator];
   }
 
   private keydown(event: KeyboardEvent) {
@@ -60,6 +63,7 @@ class NumericInput {
     this.currentCaret = -1;
     this.priorValue = '';
 
+    // case 1: not match any conditions below
     if (
       !/\d+/.test(key) &&
       !this.arrowKeys.includes(key) &&
@@ -75,13 +79,13 @@ class NumericInput {
       return false;
     }
 
+    // case 2: input's caret after separator with remove keys
     const value = this.element.value;
     const currentCaret = this.element.selectionStart;
     const previousChar = value[currentCaret - 1];
-    const fractionalChar = this.optional.separator === ',' ? '.' : ',';
     // only move caret to previous it's position
     // if match condition below
-    if (this.removeKeys.includes(key) && previousChar === fractionalChar) {
+    if (this.removeKeys.includes(key) && previousChar === this.fractionalChar) {
       const valueAtCaret = value[currentCaret];
       event.preventDefault();
       const newCaret = currentCaret - 1;
@@ -93,8 +97,22 @@ class NumericInput {
       return false;
     }
 
+    // case 3: with fractional digits > 0
+    const isNumberKey = /\d/g.test(key);
+    if (
+      this.optional.fractionDigits > 0 &&
+      this.fractionalPosition &&
+      this.fractionalPosition !== -1 &&
+      isNumberKey &&
+      currentCaret > this.fractionalPosition
+    ) {
+      this.insertChar(currentCaret, key);
+      event.preventDefault();
+      return false;
+    }
+
+    this.isNumberKey = isNumberKey;
     this.isRemoveKey = this.removeKeys.includes(key);
-    this.isNumberKey = /\d/g.test(key);
     this.isArrowKey = this.arrowKeys.includes(key);
     this.isPaste = isPaste;
     this.isSeprator = this.separatorKeys.includes(key);
@@ -111,17 +129,19 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    const pureValue = event.target.value.replace(
+    const unformatted = event.target.value.replace(
       new RegExp(this.optional.separator),
       ''
-    );
+    ); // clear the current format
     const value = event.target.value
-      ? Number(pureValue).toFixed(this.optional.fractionDigits)
+      ? Number(unformatted).toFixed(this.optional.fractionDigits)
       : '';
     const formatted = this.formatted(value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
+    // update fractional position
+    this.fractionalPosition = formatted.split('').indexOf(this.fractionalChar);
   }
 
   private formatted(value: string) {
