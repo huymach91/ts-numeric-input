@@ -4,15 +4,14 @@ import './style.css';
 class NumericInput {
   private keydownRef: any;
   private keyupRef: any;
-  private allowControlKeys = [
-    'ArrowLeft',
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowRight',
-    'Backspace',
-    'Delete',
-  ];
-  private isControlKey: boolean = false;
+  private arrowKeys = ['ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'];
+  private removeKeys = ['Backspace', 'Delete'];
+  private currentCaret: number = -1;
+  private priorValue: string = '';
+
+  private isArrowKey: boolean = false;
+  private isNumberTyping: boolean;
+  private isRemoveTyping: boolean = false;
 
   constructor(
     private element: HTMLInputElement,
@@ -30,38 +29,66 @@ class NumericInput {
 
   private keydown(event: any) {
     const key = event.key as string;
-    if (!/\d+/.test(key) && !this.allowControlKeys.includes(key)) {
+    if (
+      !/\d+/.test(key) &&
+      !this.arrowKeys.includes(key) &&
+      !this.removeKeys.includes(key)
+    ) {
       event.preventDefault();
       return false;
     }
+    this.isNumberTyping = /\d/g.test(key);
+    this.isRemoveTyping = this.removeKeys.includes(key);
+    this.isArrowKey = this.arrowKeys.includes(key);
 
-    this.isControlKey = this.allowControlKeys.includes(key);
+    this.currentCaret = this.element.selectionStart;
+    this.priorValue = this.element.value;
   }
 
   private keyup(event: any) {
-    if (this.isControlKey) return;
-    this.clearSeparator();
-    setTimeout(() => {
-      const value2 = this.element.value as string;
-      console.log(value2);
-      for (let i = value2.length - 3; i > 0; i -= 3) {
-        this.insertSeparator(i, this.optional.separator);
+    if (!this.isNumberTyping && !this.isRemoveTyping) return;
+    this.formatted(event.target.value);
+  }
+
+  private formatted(value: string) {
+    const pureValue = value.replace(
+      new RegExp(this.optional.separator, 'gi'),
+      ''
+    );
+    const formatted = this.formatNumber(pureValue);
+    this.element.value = formatted;
+    if (this.isNumberTyping || this.isRemoveTyping) {
+      const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
+      let caret = this.currentCaret + diff; // new caret after formatted
+      const currentChar = formatted.charAt(caret - 1); // commas char
+      if (currentChar === this.optional.separator && this.isRemoveTyping) {
+        this.insertSeparator(caret - 2, '');
+        caret -= 1;
       }
-    }, 10);
+      setTimeout(() => {
+        this.element.setSelectionRange(caret, caret);
+      });
+    }
   }
 
   private insertSeparator(position: number, insertValue: string) {
-    this.element.setRangeText(insertValue, position, position);
+    this.element.setRangeText(insertValue, position, position + 1);
   }
 
-  private clearSeparator() {
-    for (let i = 0; i < this.element.value.length; i++) {
-      if (this.element.value[i] === this.optional.separator) {
-        console.log(i);
-        this.element.setRangeText('', i, i + 1);
-      }
-    }
+  private formatNumber(num: string) {
+    return num
+      .toString()
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + this.optional.separator);
   }
+
+  // private clearSeparator() {
+  //   for (let i = 0; i < this.element.value.length; i++) {
+  //     if (this.element.value[i] === this.optional.separator) {
+  //       console.log(i);
+  //       this.element.setRangeText('', i, i + 1);
+  //     }
+  //   }
+  // }
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
