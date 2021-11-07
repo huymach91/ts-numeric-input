@@ -112,6 +112,7 @@ class NumericInput {
       !this.isSeprator
     )
       return;
+    
     const formatted = this.formatted(event.target.value);
     this.element.value = formatted;
     // move and remove previous it's caret
