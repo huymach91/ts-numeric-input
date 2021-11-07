@@ -123,6 +123,12 @@ class NumericInput {
       });
     }
   }
+
+  private moveCaretIfFactionalDigit(formatted: string, separator: string) {
+    if (this.isNumberTyping || this.isRemoveTyping) {
+      
+    }
+  }
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
