@@ -7,6 +7,7 @@ class NumericInput {
   private arrowKeys = ['ArrowLeft', 'ArrowRight'];
   private removeKeys = ['Backspace', 'Delete'];
   private moveKeys = ['Home', 'End'];
+  private separatorKeys = ['.', ','];
   private currentCaret: number = -1;
   private priorValue: string = '';
 
@@ -14,6 +15,7 @@ class NumericInput {
   private isNumberTyping: boolean;
   private isRemoveTyping: boolean = false;
   private isPaste: boolean = false;
+  private isSeprator: boolean = false;
 
   constructor(
     private element: HTMLInputElement,
@@ -41,7 +43,8 @@ class NumericInput {
       !this.moveKeys.includes(key) &&
       !isSelect &&
       !isCopy &&
-      !isPaste
+      !isPaste &&
+      !this.separatorKeys.includes(key)
     ) {
       event.preventDefault();
       return false;
@@ -51,13 +54,20 @@ class NumericInput {
     this.isRemoveTyping = this.removeKeys.includes(key);
     this.isArrowKey = this.arrowKeys.includes(key);
     this.isPaste = isPaste;
+    this.isSeprator = this.separatorKeys.includes(key);
 
     this.currentCaret = this.element.selectionStart;
     this.priorValue = this.element.value;
   }
 
   private keyup(event: any) {
-    if (!this.isNumberTyping && !this.isRemoveTyping && !this.isPaste) return;
+    if (
+      !this.isNumberTyping &&
+      !this.isRemoveTyping &&
+      !this.isPaste &&
+      !this.isSeprator
+    )
+      return;
     this.formatted(event.target.value);
   }
 
