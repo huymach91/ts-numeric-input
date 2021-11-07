@@ -45,6 +45,16 @@ class NumericInput {
     const isCopy = event.ctrlKey && key === 'c';
     const isPaste = event.ctrlKey && key === 'v';
 
+    // reset
+    this.isRemoveKey = false;
+    this.isNumberKey = false;
+    this.isArrowKey = false;
+    this.isPaste = false;
+    this.isSeprator = false;
+
+    this.currentCaret = -1;
+    this.priorValue = '';
+
     if (
       !/\d+/.test(key) &&
       !this.arrowKeys.includes(key) &&
@@ -56,15 +66,25 @@ class NumericInput {
       !this.separatorKeys.includes(key)
     ) {
       event.preventDefault();
-      return;
+      return false;
     }
 
+    const value = this.element.value;
     const currentCaret = this.element.selectionStart;
+    const previousChar = value[currentCaret - 1];
+    const fractionalChar = this.optional.separator === ',' ? '.' : ',';
     // only move caret to previous it's position
     // if match condition below
-    if (this.moveCaretIfFactionalDigit(this.currentCaret)) {
+    if (this.removeKeys.includes(key) && previousChar === fractionalChar) {
+      const valueAtCaret = value[currentCaret];
       event.preventDefault();
-      return;
+      const newCaret = currentCaret - 1;
+      this.element.setSelectionRange(newCaret, newCaret);
+      // undefined
+      if (!valueAtCaret) {
+        this.insertChar(newCaret, '');
+      }
+      return false;
     }
 
     this.isRemoveKey = this.removeKeys.includes(key);
@@ -132,14 +152,6 @@ class NumericInput {
         this.element.setSelectionRange(caret, caret);
       });
     }
-  }
-
-  private moveCaretIfFactionalDigit(currentCaret: number): boolean {
-    if (this.isRemoveKey) {
-      const newCaret = currentCaret - 1;
-      this.element.setSelectionRange(newCaret, newCaret);
-    }
-    return false;
   }
 }
 
