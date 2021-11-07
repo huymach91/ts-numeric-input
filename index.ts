@@ -98,6 +98,8 @@ class NumericInput {
     }
 
     // case 3: with fractional digits > 0
+    // example: [2.00|], [2.0|0], from this caret, user types number
+    // note: this '|' is an represent current caret
     const isNumberKey = /\d/g.test(key);
     if (
       this.optional.fractionDigits > 0 &&
@@ -115,6 +117,8 @@ class NumericInput {
     }
 
     // case 4: remove keys && fractional digits > 0
+    // example: [2.00|], [2.0|0], from this caret, user types backspace or delete
+    // note: this '|' is an represent current caret
     const isRemoveKey = this.removeKeys.includes(key);
     if (
       this.optional.fractionDigits > 0 &&
