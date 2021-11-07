@@ -87,17 +87,8 @@ class NumericInput {
       .toString()
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + this.optional.separator);
   }
-
-  // private clearSeparator() {
-  //   for (let i = 0; i < this.element.value.length; i++) {
-  //     if (this.element.value[i] === this.optional.separator) {
-  //       console.log(i);
-  //       this.element.setRangeText('', i, i + 1);
-  //     }
-  //   }
-  // }
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
 
-const numeric = new NumericInput(input);
+new NumericInput(input);
