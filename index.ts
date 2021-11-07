@@ -75,7 +75,7 @@ class NumericInput {
       if (currentChar === this.optional.separator && this.isRemoveTyping) {
         this.insertSeparator(caret - 2, '');
         caret -= 1;
-        const char = this.element.value.charAt(caret - 2); // this char was empty
+        const char = this.element.value.charAt(caret - 2); // if this char was empty
         if (char === '') {
           this.insertSeparator(caret - 1, '');
           caret = 0;
