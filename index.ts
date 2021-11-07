@@ -172,6 +172,20 @@ class NumericInput {
     return this.formatNumber(unformatted);
   }
 
+  private formatHasDecimalPart(value: string) {
+    if (value.search(this.fractionalChar) === -1) return value;
+    const values = value.split(this.fractionalChar);
+    const integerPart = (values[0] as string).replace(
+      new RegExp('\\' + this.optional.separator, 'g'),
+      ''
+    ); // clear the current format;
+    const decimalPart = values[1];
+    return {
+      integerPart: integerPart,
+      decimalPart: decimalPart,
+    };
+  }
+
   private insertChar(position: number, insertValue: string) {
     this.element.setRangeText(insertValue, position, position + 1);
   }
@@ -209,20 +223,6 @@ class NumericInput {
       });
     }
   }
-
-  private convertDotToCommas(value: string) {
-    if (value.search(this.fractionalChar) === -1) return value;
-    const values = value.split(this.fractionalChar);
-    const integerPart = (values[0] as string).replace(
-      new RegExp('\\' + this.optional.separator, 'g'),
-      ''
-    ); // clear the current format;
-    const decimalPart = values[1];
-    return {
-      integerPart: integerPart,
-      decimalPart: decimalPart,
-    };
-  }
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
@@ -230,4 +230,4 @@ const param: INumericInputOptional = {
   separator: '.',
   fractionDigits: 2,
 };
-new NumericInput(input, param);
+new NumericInput(input);
