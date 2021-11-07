@@ -153,16 +153,13 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    console.log('0', event.target.value, this.optional.separator);
-    const unformatted = event.target.value.replace(
+    let unformatted = event.target.value.replace(
       new RegExp('\\' + this.optional.separator, 'g'),
       ''
     ); // clear the current format
-    console.log('1', unformatted);
     const value = event.target.value
       ? Number(unformatted).toFixed(this.optional.fractionDigits)
       : '';
-    console.log('2', value);
     const formatted = this.formatted(value);
     this.element.value = formatted;
     // move and remove previous it's caret
@@ -171,12 +168,8 @@ class NumericInput {
     this.fractionalPosition = formatted.split('').indexOf(this.fractionalChar);
   }
 
-  private formatted(value: string) {
-    const pureValue = value.replace(
-      new RegExp(this.optional.separator, 'gi'),
-      ''
-    );
-    return this.formatNumber(pureValue);
+  private formatted(unformatted: string) {
+    return this.formatNumber(unformatted);
   }
 
   private insertChar(position: number, insertValue: string) {
@@ -215,6 +208,20 @@ class NumericInput {
         this.element.setSelectionRange(caret, caret);
       });
     }
+  }
+
+  private convertDotToCommas(value: string) {
+    if (value.search(this.fractionalChar) === -1) return value;
+    const values = value.split(this.fractionalChar);
+    const integerPart = (values[0] as string).replace(
+      new RegExp('\\' + this.optional.separator, 'g'),
+      ''
+    ); // clear the current format;
+    const decimalPart = values[1];
+    return {
+      integerPart: integerPart,
+      decimalPart: decimalPart,
+    };
   }
 }
 
