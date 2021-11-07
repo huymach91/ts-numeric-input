@@ -111,6 +111,9 @@ class NumericInput {
       return false;
     }
 
+    // case 4: fractional part's length is over the it's ditgits
+
+    // last case: apply format to number
     this.isNumberKey = isNumberKey;
     this.isRemoveKey = this.removeKeys.includes(key);
     this.isArrowKey = this.arrowKeys.includes(key);
