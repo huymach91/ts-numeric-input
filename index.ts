@@ -1,6 +1,11 @@
 // Import stylesheets
 import './style.css';
 
+export interface INumericInputOptional {
+  separator: ',' | '.';
+  fractionalDigits: number;
+}
+
 class NumericInput {
   private keydownRef: any;
   private keyupRef: any;
@@ -19,7 +24,10 @@ class NumericInput {
 
   constructor(
     private element: HTMLInputElement,
-    private optional: { separator: ',' | '.' } = { separator: ',' }
+    private optional: INumericInputOptional = {
+      separator: ',',
+      fractionalDigits: 2,
+    }
   ) {
     this.init();
   }
@@ -78,11 +86,30 @@ class NumericInput {
     );
     const formatted = this.formatNumber(pureValue);
     this.element.value = formatted;
+    this.keepCaretIfSeparator(formatted, this.optional.separator);
+  }
+
+  private insertChar(position: number, insertValue: string) {
+    this.element.setRangeText(insertValue, position, position + 1);
+  }
+
+  private formatNumber(num: string) {
+    return num
+      .toString()
+      .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + this.optional.separator);
+  }
+
+  /*
+    summary: this function solves the case of current caret which is putted before the commas (,) or separator
+    @param: formatted, ex: 1,200
+    @param: separator can be ',' or '.'
+  */
+  private keepCaretIfSeparator(formatted: string, separator: string) {
     if (this.isNumberTyping || this.isRemoveTyping) {
       const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
-      if (currentChar === this.optional.separator && this.isRemoveTyping) {
+      if (currentChar === separator && this.isRemoveTyping) {
         this.insertChar(caret - 2, '');
         caret -= 1;
         const char = this.element.value.charAt(caret - 2); // if this char was empty
@@ -95,16 +122,6 @@ class NumericInput {
         this.element.setSelectionRange(caret, caret);
       });
     }
-  }
-
-  private insertChar(position: number, insertValue: string) {
-    this.element.setRangeText(insertValue, position, position + 1);
-  }
-
-  private formatNumber(num: string) {
-    return num
-      .toString()
-      .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + this.optional.separator);
   }
 }
 
