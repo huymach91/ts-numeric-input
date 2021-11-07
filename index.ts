@@ -134,12 +134,6 @@ class NumericInput {
       return false;
     }
 
-    console.log(
-      'last step',
-      currentCaret,
-      this.optional.fractionDigits + this.fractionalPosition
-    );
-
     // last case: apply format to number
     this.isNumberKey = isNumberKey;
     this.isRemoveKey = isRemoveKey;
@@ -159,13 +153,16 @@ class NumericInput {
       !this.isSeprator
     )
       return;
+    console.log('0', event.target.value, this.optional.separator);
     const unformatted = event.target.value.replace(
-      new RegExp(this.optional.separator),
+      new RegExp('\\' + this.optional.separator, 'g'),
       ''
     ); // clear the current format
+    console.log('1', unformatted);
     const value = event.target.value
       ? Number(unformatted).toFixed(this.optional.fractionDigits)
       : '';
+    console.log('2', value);
     const formatted = this.formatted(value);
     this.element.value = formatted;
     // move and remove previous it's caret
@@ -222,5 +219,8 @@ class NumericInput {
 }
 
 const input = document.getElementById('input') as HTMLInputElement;
-
-new NumericInput(input);
+const param: INumericInputOptional = {
+  separator: '.',
+  fractionDigits: 2,
+};
+new NumericInput(input, param);
