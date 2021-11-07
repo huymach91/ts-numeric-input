@@ -106,16 +106,39 @@ class NumericInput {
       isNumberKey &&
       currentCaret > this.fractionalPosition
     ) {
-      this.insertChar(currentCaret, key);
+      const limit = this.optional.fractionDigits + this.fractionalPosition;
+      if (currentCaret <= limit) {
+        this.insertChar(currentCaret, key);
+      }
       event.preventDefault();
       return false;
     }
 
-    // case 4: fractional part's length is over the it's ditgits
+    // case 4: remove keys && fractional digits > 0
+    const isRemoveKey = this.removeKeys.includes(key);
+    if (
+      this.optional.fractionDigits > 0 &&
+      this.fractionalPosition &&
+      this.fractionalPosition !== -1 &&
+      isRemoveKey &&
+      currentCaret > this.fractionalPosition
+    ) {
+      const newCaret = currentCaret - 1;
+      this.insertChar(newCaret, '0');
+      this.element.setSelectionRange(newCaret, newCaret);
+      event.preventDefault();
+      return false;
+    }
+
+    console.log(
+      'last step',
+      currentCaret,
+      this.optional.fractionDigits + this.fractionalPosition
+    );
 
     // last case: apply format to number
     this.isNumberKey = isNumberKey;
-    this.isRemoveKey = this.removeKeys.includes(key);
+    this.isRemoveKey = isRemoveKey;
     this.isArrowKey = this.arrowKeys.includes(key);
     this.isPaste = isPaste;
     this.isSeprator = this.separatorKeys.includes(key);
