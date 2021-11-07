@@ -69,8 +69,7 @@ class NumericInput {
       !isCopy &&
       !isPaste &&
       !isCut &&
-      !isUndo &&
-      !this.separatorKeys.includes(key)
+      !isUndo
     ) {
       event.preventDefault();
       return false;
