@@ -13,6 +13,7 @@ class NumericInput {
   private isArrowKey: boolean = false;
   private isNumberTyping: boolean;
   private isRemoveTyping: boolean = false;
+  private isPaste: boolean = false;
 
   constructor(
     private element: HTMLInputElement,
@@ -28,27 +29,35 @@ class NumericInput {
     this.element.addEventListener('keyup', this.keyupRef);
   }
 
-  private keydown(event: any) {
+  private keydown(event: KeyboardEvent) {
     const key = event.key as string;
+    const isSelect = event.ctrlKey && key === 'a';
+    const isCopy = event.ctrlKey && key === 'c';
+    const isPaste = event.ctrlKey && key === 'v';
     if (
       !/\d+/.test(key) &&
       !this.arrowKeys.includes(key) &&
       !this.removeKeys.includes(key) &&
-      !this.moveKeys.includes(key)
+      !this.moveKeys.includes(key) &&
+      !isSelect &&
+      !isCopy &&
+      !isPaste
     ) {
       event.preventDefault();
       return false;
     }
+
     this.isNumberTyping = /\d/g.test(key);
     this.isRemoveTyping = this.removeKeys.includes(key);
     this.isArrowKey = this.arrowKeys.includes(key);
+    this.isPaste = isPaste;
 
     this.currentCaret = this.element.selectionStart;
     this.priorValue = this.element.value;
   }
 
   private keyup(event: any) {
-    if (!this.isNumberTyping && !this.isRemoveTyping) return;
+    if (!this.isNumberTyping && !this.isRemoveTyping && !this.isPaste) return;
     this.formatted(event.target.value);
   }
 
