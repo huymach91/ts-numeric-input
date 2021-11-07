@@ -56,19 +56,15 @@ class NumericInput {
       !this.separatorKeys.includes(key)
     ) {
       event.preventDefault();
-      return false;
+      return;
     }
 
     const currentCaret = this.element.selectionStart;
     // only move caret to previous it's position
-    if (
-      this.removeKeys.includes(key) &&
-      this.element.value[currentCaret - 1] === '.'
-    ) {
-      const newCaret = currentCaret - 1;
-      this.element.setSelectionRange(newCaret, newCaret);
+    // if match condition below
+    if (this.moveCaretIfFactionalDigit(this.currentCaret)) {
       event.preventDefault();
-      return false;
+      return;
     }
 
     this.isRemoveKey = this.removeKeys.includes(key);
@@ -138,18 +134,10 @@ class NumericInput {
     }
   }
 
-  private moveCaretIfFactionalDigit(formatted: string): boolean {
-    if (this.isNumberKey || this.isRemoveKey) {
-      const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
-      let caret = this.currentCaret + diff; // new caret after formatted
-      const currentChar = formatted.charAt(caret - 1); // dot char
-      const fractionChar = this.optional.separator === ',' ? '.' : ',';
-      if (currentChar === fractionChar && this.isRemoveKey) {
-        console.log('1');
-        const newCaret = caret - 2;
-        this.element.setSelectionRange(newCaret, newCaret);
-        return true;
-      }
+  private moveCaretIfFactionalDigit(currentCaret: number): boolean {
+    if (this.isRemoveKey) {
+      const newCaret = currentCaret - 1;
+      this.element.setSelectionRange(newCaret, newCaret);
     }
     return false;
   }
