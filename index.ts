@@ -118,7 +118,7 @@ class NumericInput {
     );
     const value = event.target.value
       ? Number(pureValue).toFixed(this.optional.fractionDigits)
-      : '0';
+      : '';
     const formatted = this.formatted(value);
     this.element.value = formatted;
     // move and remove previous it's caret
@@ -150,7 +150,10 @@ class NumericInput {
   */
   private keepCaretIfSeparator(formatted: string) {
     if (this.isNumberKey || this.isRemoveKey) {
-      const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
+      let diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
+      if (!this.priorValue) {
+        diff -= this.optional.fractionDigits + 1;
+      }
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
       if (currentChar === this.optional.separator && this.isRemoveKey) {
