@@ -17,8 +17,8 @@ class NumericInput {
   private priorValue: string = '';
 
   private isArrowKey: boolean = false;
-  private isNumberTyping: boolean;
-  private isRemoveTyping: boolean = false;
+  private isNumberKey: boolean;
+  private isRemoveKey: boolean = false;
   private isPaste: boolean = false;
   private isSeprator: boolean = false;
 
@@ -59,20 +59,32 @@ class NumericInput {
       return false;
     }
 
-    this.isNumberTyping = /\d/g.test(key);
-    this.isRemoveTyping = this.removeKeys.includes(key);
+    const currentCaret = this.element.selectionStart;
+    // only move caret to previous it's position
+    if (
+      this.removeKeys.includes(key) &&
+      this.element.value[currentCaret - 1] === '.'
+    ) {
+      const newCaret = currentCaret - 1;
+      this.element.setSelectionRange(newCaret, newCaret);
+      event.preventDefault();
+      return false;
+    }
+
+    this.isRemoveKey = this.removeKeys.includes(key);
+    this.isNumberKey = /\d/g.test(key);
     this.isArrowKey = this.arrowKeys.includes(key);
     this.isPaste = isPaste;
     this.isSeprator = this.separatorKeys.includes(key);
 
-    this.currentCaret = this.element.selectionStart;
+    this.currentCaret = currentCaret;
     this.priorValue = this.element.value;
   }
 
   private keyup(event: any) {
     if (
-      !this.isNumberTyping &&
-      !this.isRemoveTyping &&
+      !this.isNumberKey &&
+      !this.isRemoveKey &&
       !this.isPaste &&
       !this.isSeprator
     )
@@ -81,10 +93,6 @@ class NumericInput {
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
-    // only move caret to previous it's position
-    if (this.moveCaretIfFactionalDigit(formatted)) {
-      event.preventDefault();
-    }
   }
 
   private formatted(value: string) {
@@ -111,11 +119,11 @@ class NumericInput {
     @param: separator can be ',' or '.'
   */
   private keepCaretIfSeparator(formatted: string) {
-    if (this.isNumberTyping || this.isRemoveTyping) {
+    if (this.isNumberKey || this.isRemoveKey) {
       const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
-      if (currentChar === this.optional.separator && this.isRemoveTyping) {
+      if (currentChar === this.optional.separator && this.isRemoveKey) {
         this.insertChar(caret - 2, '');
         caret -= 1;
         const char = this.element.value.charAt(caret - 2); // if this char was empty
@@ -131,12 +139,13 @@ class NumericInput {
   }
 
   private moveCaretIfFactionalDigit(formatted: string): boolean {
-    if (this.isNumberTyping || this.isRemoveTyping) {
+    if (this.isNumberKey || this.isRemoveKey) {
       const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // dot char
       const fractionChar = this.optional.separator === ',' ? '.' : ',';
-      if (currentChar === fractionChar && this.isRemoveTyping) {
+      if (currentChar === fractionChar && this.isRemoveKey) {
+        console.log('1');
         const newCaret = caret - 2;
         this.element.setSelectionRange(newCaret, newCaret);
         return true;
