@@ -77,7 +77,14 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    this.formatted(event.target.value);
+    const formatted = this.formatted(event.target.value);
+    this.element.value = formatted;
+    // move and remove previous it's caret
+    this.keepCaretIfSeparator(formatted);
+    // only move caret to previous it's position
+    if (this.moveCaretIfFactionalDigit(formatted)) {
+      event.preventDefault();
+    }
   }
 
   private formatted(value: string) {
@@ -85,10 +92,7 @@ class NumericInput {
       new RegExp(this.optional.separator, 'gi'),
       ''
     );
-    const formatted = this.formatNumber(pureValue);
-    this.element.value = formatted;
-    this.keepCaretIfSeparator(formatted);
-    this.moveCaretIfFactionalDigit(formatted);
+    return this.formatNumber(pureValue);
   }
 
   private insertChar(position: number, insertValue: string) {
@@ -126,7 +130,7 @@ class NumericInput {
     }
   }
 
-  private moveCaretIfFactionalDigit(formatted: string) {
+  private moveCaretIfFactionalDigit(formatted: string): boolean {
     if (this.isNumberTyping || this.isRemoveTyping) {
       const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       let caret = this.currentCaret + diff; // new caret after formatted
@@ -135,8 +139,10 @@ class NumericInput {
       if (currentChar === fractionChar && this.isRemoveTyping) {
         const newCaret = caret - 2;
         this.element.setSelectionRange(newCaret, newCaret);
+        return true;
       }
     }
+    return false;
   }
 }
 
