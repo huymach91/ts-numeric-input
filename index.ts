@@ -39,8 +39,8 @@ class NumericInput {
     this.element.addEventListener('keyup', this.keyupRef);
 
     this.separatorKeys = this.optional.fractionDigits
-      ? [this.optional.separator]
-      : ['.', ','];
+      ? ['.', ',']
+      : [this.optional.separator];
   }
 
   private keydown(event: KeyboardEvent) {
