@@ -3,7 +3,7 @@ import './style.css';
 
 export interface INumericInputOptional {
   separator: ',' | '.';
-  fractionalDigits: number;
+  fractionDigits: number;
 }
 
 class NumericInput {
@@ -26,7 +26,7 @@ class NumericInput {
     private element: HTMLInputElement,
     private optional: INumericInputOptional = {
       separator: ',',
-      fractionalDigits: 2,
+      fractionDigits: 2,
     }
   ) {
     this.init();
@@ -44,6 +44,7 @@ class NumericInput {
     const isSelect = event.ctrlKey && key === 'a';
     const isCopy = event.ctrlKey && key === 'c';
     const isPaste = event.ctrlKey && key === 'v';
+
     if (
       !/\d+/.test(key) &&
       !this.arrowKeys.includes(key) &&
@@ -86,7 +87,8 @@ class NumericInput {
     );
     const formatted = this.formatNumber(pureValue);
     this.element.value = formatted;
-    this.keepCaretIfSeparator(formatted, this.optional.separator);
+    this.keepCaretIfSeparator(formatted);
+    this.moveCaretIfFactionalDigit(formatted);
   }
 
   private insertChar(position: number, insertValue: string) {
@@ -104,12 +106,12 @@ class NumericInput {
     @param: formatted, ex: 1,200
     @param: separator can be ',' or '.'
   */
-  private keepCaretIfSeparator(formatted: string, separator: string) {
+  private keepCaretIfSeparator(formatted: string) {
     if (this.isNumberTyping || this.isRemoveTyping) {
       const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
-      if (currentChar === separator && this.isRemoveTyping) {
+      if (currentChar === this.optional.separator && this.isRemoveTyping) {
         this.insertChar(caret - 2, '');
         caret -= 1;
         const char = this.element.value.charAt(caret - 2); // if this char was empty
@@ -124,9 +126,16 @@ class NumericInput {
     }
   }
 
-  private moveCaretIfFactionalDigit(formatted: string, separator: string) {
+  private moveCaretIfFactionalDigit(formatted: string) {
     if (this.isNumberTyping || this.isRemoveTyping) {
-      
+      const diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
+      let caret = this.currentCaret + diff; // new caret after formatted
+      const currentChar = formatted.charAt(caret - 1); // dot char
+      const fractionChar = this.optional.separator === ',' ? '.' : ',';
+      if (currentChar === fractionChar && this.isRemoveTyping) {
+        const newCaret = caret - 2;
+        this.element.setSelectionRange(newCaret, newCaret);
+      }
     }
   }
 }
