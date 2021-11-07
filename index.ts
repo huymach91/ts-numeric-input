@@ -4,8 +4,9 @@ import './style.css';
 class NumericInput {
   private keydownRef: any;
   private keyupRef: any;
-  private arrowKeys = ['ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'];
+  private arrowKeys = ['ArrowLeft', 'ArrowRight'];
   private removeKeys = ['Backspace', 'Delete'];
+  private moveKeys = ['Home', 'End'];
   private currentCaret: number = -1;
   private priorValue: string = '';
 
@@ -32,7 +33,8 @@ class NumericInput {
     if (
       !/\d+/.test(key) &&
       !this.arrowKeys.includes(key) &&
-      !this.removeKeys.includes(key)
+      !this.removeKeys.includes(key) &&
+      !this.moveKeys.includes(key)
     ) {
       event.preventDefault();
       return false;
