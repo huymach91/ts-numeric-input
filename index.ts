@@ -73,11 +73,11 @@ class NumericInput {
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
       if (currentChar === this.optional.separator && this.isRemoveTyping) {
-        this.insertSeparator(caret - 2, '');
+        this.insertChar(caret - 2, '');
         caret -= 1;
         const char = this.element.value.charAt(caret - 2); // if this char was empty
         if (char === '') {
-          this.insertSeparator(caret - 1, '');
+          this.insertChar(caret - 1, '');
           caret = 0;
         }
       }
@@ -87,7 +87,7 @@ class NumericInput {
     }
   }
 
-  private insertSeparator(position: number, insertValue: string) {
+  private insertChar(position: number, insertValue: string) {
     this.element.setRangeText(insertValue, position, position + 1);
   }
 
