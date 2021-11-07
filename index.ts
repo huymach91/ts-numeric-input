@@ -112,8 +112,14 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    
-    const formatted = this.formatted(event.target.value);
+    const pureValue = event.target.value.replace(
+      new RegExp(this.optional.separator),
+      ''
+    );
+    const value = event.target.value
+      ? Number(pureValue).toFixed(this.optional.fractionDigits)
+      : '0';
+    const formatted = this.formatted(value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
