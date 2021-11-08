@@ -108,6 +108,7 @@ class NumericInput {
       isNumberKey &&
       currentCaret > this.fractionalPosition
     ) {
+      console.log('case 3', currentCaret, this.fractionalPosition);
       const limit = this.optional.fractionDigits + this.fractionalPosition;
       if (currentCaret <= limit) {
         this.insertChar(currentCaret, key);
@@ -180,7 +181,7 @@ class NumericInput {
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
     // update fractional position
-    this.fractionalPosition = formatted.split('').indexOf(this.fractionalChar);
+    this.fractionalPosition = formatted.search(this.fractionalChar);
   }
 
   private noDecimal(value: string) {
