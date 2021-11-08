@@ -153,7 +153,7 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    // convert it
+    // unformat the current value
     let unformatted = event.target.value.replace(
       new RegExp('\\' + this.optional.separator, 'g'),
       ''
