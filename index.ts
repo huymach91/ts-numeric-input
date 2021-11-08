@@ -204,6 +204,7 @@ class NumericInput {
     @param: separator can be ',' or '.'
   */
   private keepCaretIfSeparator(formatted: string) {
+    if (!this.priorValue) return;
     if (this.isNumberKey || this.isRemoveKey) {
       let diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       if (!this.priorValue) {
