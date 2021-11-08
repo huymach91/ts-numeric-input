@@ -248,9 +248,16 @@ class NumericInput {
   }
 }
 
-const input = document.getElementById('input') as HTMLInputElement;
-const param: INumericInputOptional = {
+const integer = document.getElementById('integer') as HTMLInputElement;
+const integerParam: INumericInputOptional = {
+  separator: ',',
+  fractionDigits: 0,
+};
+new NumericInput(integer, integerParam);
+
+const float = document.getElementById('float') as HTMLInputElement;
+const floatParam: INumericInputOptional = {
   separator: ',',
   fractionDigits: 2,
 };
-new NumericInput(input, param);
+new NumericInput(float, floatParam);
