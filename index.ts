@@ -134,6 +134,22 @@ class NumericInput {
       return false;
     }
 
+    // case 5: 0|.00
+    if (
+      this.optional.fractionDigits &&
+      isRemoveKey &&
+      value[currentCaret] === this.fractionalChar &&
+      !value[currentCaret - 2]
+    ) {
+      const values = value.split(this.fractionalChar);
+      const decimalPart = +values[1];
+      if (!decimalPart) {
+        this.element.value = '';
+        event.preventDefault();
+        return false;
+      }
+    }
+
     // last case: apply format to number
     this.isNumberKey = isNumberKey;
     this.isRemoveKey = isRemoveKey;
