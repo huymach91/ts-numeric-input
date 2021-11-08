@@ -29,7 +29,7 @@ class NumericInput {
     private element: HTMLInputElement,
     private optional: INumericInputOptional = {
       separator: ',',
-      fractionDigits: 2,
+      fractionDigits: 0,
     }
   ) {
     this.fractionalChar = this.optional.separator === ',' ? '.' : ',';
