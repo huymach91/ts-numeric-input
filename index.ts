@@ -153,17 +153,9 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    // unformat the current value
-    let unformatted = event.target.value.replace(
-      new RegExp('\\' + this.optional.separator, 'g'),
-      ''
-    );
-    const value = event.target.value
-      ? Number(unformatted).toFixed(this.optional.fractionDigits)
-      : '';
 
-    // format new value and assign to element's value
-    const formatted = this.formatNumber(value);
+    // case 1: config with no decimal part
+    const formatted = this.noDecimal(event.target.value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
@@ -171,7 +163,18 @@ class NumericInput {
     this.fractionalPosition = formatted.split('').indexOf(this.fractionalChar);
   }
 
-  private formatHasDecimalPart(value: string) {
+  private noDecimal(value: string) {
+    let unformatted = value.replace(
+      new RegExp('\\' + this.optional.separator, 'g'),
+      ''
+    );
+    // format new value and assign to element's value
+    return this.formatNumber(
+      value ? Number(unformatted).toFixed(this.optional.fractionDigits) : ''
+    );
+  }
+
+  private decimalPart(value: string) {
     if (value.search(this.fractionalChar) === -1) return value;
     const values = value.split(this.fractionalChar);
     const integerPart = (values[0] as string).replace(
