@@ -22,7 +22,6 @@ class NumericInput {
   private isPaste: boolean = false;
   private isSeprator: boolean = false;
 
-  private fractionalPosition: number;
   private fractionalChar: string;
 
   constructor(
@@ -100,16 +99,16 @@ class NumericInput {
     // case 3: with fractional digits > 0
     // example: [2.00|], [2.0|0], from this caret, user types number
     // note: this '|' is an represent current caret
+    const fractionalPosition = value.split('').indexOf(this.fractionalChar);
     const isNumberKey = /\d/g.test(key);
     if (
       this.optional.fractionDigits > 0 &&
-      this.fractionalPosition &&
-      this.fractionalPosition !== -1 &&
+      fractionalPosition &&
+      fractionalPosition !== -1 &&
       isNumberKey &&
-      currentCaret > this.fractionalPosition
+      currentCaret > fractionalPosition
     ) {
-      console.log('case 3', currentCaret, this.fractionalPosition);
-      const limit = this.optional.fractionDigits + this.fractionalPosition;
+      const limit = this.optional.fractionDigits + fractionalPosition;
       if (currentCaret <= limit) {
         this.insertChar(currentCaret, key);
       }
@@ -123,10 +122,10 @@ class NumericInput {
     const isRemoveKey = this.removeKeys.includes(key);
     if (
       this.optional.fractionDigits > 0 &&
-      this.fractionalPosition &&
-      this.fractionalPosition !== -1 &&
+      fractionalPosition &&
+      fractionalPosition !== -1 &&
       isRemoveKey &&
-      currentCaret > this.fractionalPosition
+      currentCaret > fractionalPosition
     ) {
       const newCaret = currentCaret - 1;
       this.insertChar(newCaret, '0');
@@ -170,7 +169,6 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-
     // case 1: config with no decimal part
     const value = event.target.value;
     const formatted =
@@ -180,8 +178,6 @@ class NumericInput {
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
-    // update fractional position
-    this.fractionalPosition = formatted.search(this.fractionalChar);
   }
 
   private noDecimal(value: string) {
