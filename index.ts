@@ -155,7 +155,10 @@ class NumericInput {
       return;
 
     // case 1: config with no decimal part
-    const formatted = this.noDecimal(event.target.value);
+    const value = event.target.value;
+    const formatted = this.optional.fractionDigits
+      ? this.decimalPart(value)
+      : this.noDecimal(value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
@@ -175,17 +178,21 @@ class NumericInput {
   }
 
   private decimalPart(value: string) {
-    if (value.search(this.fractionalChar) === -1) return value;
+    console.log('0', value, this.fractionalChar);
+    if (value.search(this.fractionalChar) === -1) {
+      const formatted = this.noDecimal(value).replace('.', this.fractionalChar);
+      return formatted;
+    }
     const values = value.split(this.fractionalChar);
-    const integerPart = (values[0] as string).replace(
-      new RegExp('\\' + this.optional.separator, 'g'),
-      ''
+    console.log('values', values);
+    const integerPart = this.formatNumber(
+      (values[0] as string).replace(
+        new RegExp('\\' + this.optional.separator, 'g'),
+        ''
+      )
     ); // clear the current format;
     const decimalPart = values[1];
-    return {
-      integerPart: integerPart,
-      decimalPart: decimalPart,
-    };
+    return integerPart + this.fractionalChar + decimalPart;
   }
 
   private insertChar(position: number, insertValue: string) {
@@ -204,7 +211,7 @@ class NumericInput {
     @param: separator can be ',' or '.'
   */
   private keepCaretIfSeparator(formatted: string) {
-    if (!this.priorValue) return;
+    if (!this.priorValue && !this.optional.fractionDigits) return;
     if (this.isNumberKey || this.isRemoveKey) {
       let diff = this.element.value.length - this.priorValue.length; // difference of # chars between before and after being formatted
       if (!this.priorValue) {
@@ -233,4 +240,4 @@ const param: INumericInputOptional = {
   separator: '.',
   fractionDigits: 2,
 };
-new NumericInput(input);
+new NumericInput(input, param);
