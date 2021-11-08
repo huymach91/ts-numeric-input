@@ -14,6 +14,7 @@ class NumericInput {
   private moveKeys = ['Home', 'End'];
   private separatorKeys = ['.', ','];
   private currentCaret: number = -1;
+
   private priorValue: string = '';
 
   private isArrowKey: boolean = false;
@@ -229,13 +230,6 @@ class NumericInput {
       if (!this.priorValue) {
         diff -= this.optional.fractionDigits + 1;
       }
-      console.log(
-        'diff',
-        this.currentCaret,
-        this.element.value.length,
-        diff,
-        this.priorValue
-      );
       let caret = this.currentCaret + diff; // new caret after formatted
       const currentChar = formatted.charAt(caret - 1); // commas char
       if (currentChar === this.optional.separator && this.isRemoveKey) {
@@ -248,7 +242,6 @@ class NumericInput {
         }
       }
       setTimeout(() => {
-        console.log('caret', caret);
         this.element.setSelectionRange(caret, caret);
       });
     }
