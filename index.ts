@@ -156,9 +156,10 @@ class NumericInput {
 
     // case 1: config with no decimal part
     const value = event.target.value;
-    const formatted = this.optional.fractionDigits
-      ? this.decimalPart(value)
-      : this.noDecimal(value);
+    const formatted =
+      this.optional.fractionDigits && this.fractionalChar === ','
+        ? this.decimalPart(value)
+        : this.noDecimal(value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
@@ -178,9 +179,9 @@ class NumericInput {
   }
 
   private decimalPart(value: string) {
-    console.log('0', value, this.fractionalChar);
     if (value.search(this.fractionalChar) === -1) {
       const formatted = this.noDecimal(value).replace('.', this.fractionalChar);
+      console.log(1, formatted);
       return formatted;
     }
     const values = value.split(this.fractionalChar);
@@ -191,7 +192,7 @@ class NumericInput {
       )
     ); // clear the current format;
     const decimalPart = values[1];
-    return integerPart + this.fractionalChar + decimalPart;
+    return integerPart ? integerPart + this.fractionalChar + decimalPart : '';
   }
 
   private insertChar(position: number, insertValue: string) {
@@ -236,7 +237,7 @@ class NumericInput {
 
 const input = document.getElementById('input') as HTMLInputElement;
 const param: INumericInputOptional = {
-  separator: '.',
+  separator: ',',
   fractionDigits: 2,
 };
 new NumericInput(input, param);
