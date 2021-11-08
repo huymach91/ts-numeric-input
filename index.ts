@@ -184,7 +184,6 @@ class NumericInput {
       return formatted;
     }
     const values = value.split(this.fractionalChar);
-    console.log('values', values);
     const integerPart = this.formatNumber(
       (values[0] as string).replace(
         new RegExp('\\' + this.optional.separator, 'g'),
