@@ -153,23 +153,22 @@ class NumericInput {
       !this.isSeprator
     )
       return;
+    // convert it
     let unformatted = event.target.value.replace(
       new RegExp('\\' + this.optional.separator, 'g'),
       ''
-    ); // clear the current format
+    );
     const value = event.target.value
       ? Number(unformatted).toFixed(this.optional.fractionDigits)
       : '';
-    const formatted = this.formatted(value);
+
+    // format new value and assign to element's value
+    const formatted = this.formatNumber(value);
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
     // update fractional position
     this.fractionalPosition = formatted.split('').indexOf(this.fractionalChar);
-  }
-
-  private formatted(unformatted: string) {
-    return this.formatNumber(unformatted);
   }
 
   private formatHasDecimalPart(value: string) {
