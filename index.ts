@@ -181,7 +181,6 @@ class NumericInput {
   private decimalPart(value: string) {
     if (value.search(this.fractionalChar) === -1) {
       const formatted = this.noDecimal(value).replace('.', this.fractionalChar);
-      console.log(1, formatted);
       return formatted;
     }
     const values = value.split(this.fractionalChar);
