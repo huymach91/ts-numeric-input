@@ -112,9 +112,15 @@ class NumericInput {
       currentCaret > fractionalPosition
     ) {
       const limit = this.optional.fractionDigits + fractionalPosition;
-      if (currentCaret <= limit) {
+      // without percentage
+      if (!this.optional.percentage && currentCaret <= limit) {
         this.insertChar(currentCaret, key);
       }
+      // validate if percentage
+      if (this.optional.percentage && +value < 100 && currentCaret <= limit) {
+        this.insertChar(currentCaret, key);
+      }
+
       event.preventDefault();
       return false;
     }
@@ -172,17 +178,20 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    const value = event.target.value;
-    let formatted = value;
-    // case 1: if percentage = true, it's value must be [0, 100]
-    if (this.optional.percentage) {
-      formatted = this.percentage(value);
-    }
-    // case 2: config with no decimal part
-    formatted =
+
+    let value = event.target.value;
+
+    // case 1: config with no decimal part
+    let formatted =
       this.optional.fractionDigits && this.fractionalChar === ','
-        ? this.decimalPart(formatted)
-        : this.noDecimal(formatted);
+        ? this.decimalPart(value)
+        : this.noDecimal(value);
+
+    // case 2: if percentage = true, it's value must be [0, 100]
+    if (this.optional.percentage) {
+      console.log(this.unformat(formatted));
+      formatted = this.percentage(this.unformat(formatted));
+    }
 
     this.element.value = formatted;
     // move and remove previous it's caret
@@ -238,6 +247,20 @@ class NumericInput {
     return num
       .toString()
       .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + this.optional.separator);
+  }
+
+  private unformat(value: string) {
+    // unformat integer part
+    let newValue = value.replace(
+      new RegExp('\\' + this.optional.separator, 'g'),
+      ''
+    );
+    // unformat decimal part
+    if (this.fractionalChar === ',') {
+      newValue.replace(',', '.');
+    }
+
+    return newValue;
   }
 
   /*
