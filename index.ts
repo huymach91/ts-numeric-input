@@ -287,7 +287,17 @@ new NumericInput(float, floatParam);
 const percentage = document.getElementById('percentage') as HTMLInputElement;
 const percentageParam: INumericInputOptional = {
   separator: ',',
-  fractionDigits: 0,
+  fractionDigits: 2,
   percentage: true,
 };
 new NumericInput(percentage, percentageParam);
+
+const percentage_2 = document.getElementById(
+  'percentage_2'
+) as HTMLInputElement;
+const percentage2Param: INumericInputOptional = {
+  separator: ',',
+  fractionDigits: 0,
+  percentage: true,
+};
+new NumericInput(percentage_2, percentage2Param);
