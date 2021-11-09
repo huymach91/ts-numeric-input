@@ -4,6 +4,7 @@ import './style.css';
 export interface INumericInputOptional {
   separator: ',' | '.';
   fractionDigits: number;
+  negative?: boolean;
 }
 
 class NumericInput {
@@ -206,6 +207,19 @@ class NumericInput {
     ); // clear the current format;
     const decimalPart = values[1];
     return integerPart ? integerPart + this.fractionalChar + decimalPart : '';
+  }
+
+  private percentage(value: string) {
+    const valueAsNumber = +value as number;
+    if (valueAsNumber > 100) {
+      return 100;
+    }
+
+    if (valueAsNumber < 0) {
+      return 0;
+    }
+
+    return value;
   }
 
   private insertChar(position: number, insertValue: string) {
