@@ -4,3 +4,7 @@ input {
   border-width: 1px;
   padding: 0 5px;
 }
+
+h4 {
+  margin-bottom: 5px;
+}
