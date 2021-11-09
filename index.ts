@@ -189,7 +189,6 @@ class NumericInput {
 
     // case 2: if percentage = true, it's value must be [0, 100]
     if (this.optional.percentage) {
-      console.log(this.unformat(formatted));
       formatted = this.percentage(this.unformat(formatted));
     }
 
