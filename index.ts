@@ -5,6 +5,7 @@ export interface INumericInputOptional {
   separator: ',' | '.';
   fractionDigits: number;
   negative?: boolean;
+  percentage?: boolean;
 }
 
 class NumericInput {
@@ -171,12 +172,18 @@ class NumericInput {
       !this.isSeprator
     )
       return;
-    // case 1: config with no decimal part
     const value = event.target.value;
-    const formatted =
+    let formatted = value;
+    // case 1: if percentage = true, it's value must be [0, 100]
+    if (this.optional.percentage) {
+      formatted = this.percentage(value);
+    }
+    // case 2: config with no decimal part
+    formatted =
       this.optional.fractionDigits && this.fractionalChar === ','
-        ? this.decimalPart(value)
-        : this.noDecimal(value);
+        ? this.decimalPart(formatted)
+        : this.noDecimal(formatted);
+
     this.element.value = formatted;
     // move and remove previous it's caret
     this.keepCaretIfSeparator(formatted);
@@ -211,12 +218,13 @@ class NumericInput {
 
   private percentage(value: string) {
     const valueAsNumber = +value as number;
+
     if (valueAsNumber > 100) {
-      return 100;
+      return '100';
     }
 
     if (valueAsNumber < 0) {
-      return 0;
+      return '0';
     }
 
     return value;
@@ -279,6 +287,7 @@ new NumericInput(float, floatParam);
 const percentage = document.getElementById('percentage') as HTMLInputElement;
 const percentageParam: INumericInputOptional = {
   separator: ',',
-  fractionDigits: 2,
+  fractionDigits: 0,
+  percentage: true,
 };
-new NumericInput(float, percentageParam);
+new NumericInput(percentage, percentageParam);
